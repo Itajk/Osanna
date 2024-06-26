@@ -9,6 +9,6 @@ public class Scaler : MonoBehaviour
 
     void Update()
     {
-        transform.localScale += _scalingDirection * _scalingSpeed;
+        transform.localScale += _scalingDirection.normalized * _scalingSpeed;
     }
 }
