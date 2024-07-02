@@ -2,62 +2,67 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using System;
-using Unity.VisualScripting;
-using UnityEngine.Rendering.Universal;
 
 public class Exploder : MonoBehaviour
 {
+    [SerializeField] private Spawner _spawner;
     [SerializeField] private float _explosionRadius;
     [SerializeField] private float _explosionForce;
 
-    private List<GameObject> _affectableObjects;
-    private List<int> _affectableObjectsIdentifiers;
+    private List<Cube> _affectableCubes;
 
-    private void Start()
+    public string GetIdentifiers()
     {
-        _affectableObjects = new List<GameObject>();
-        _affectableObjectsIdentifiers = new List<int>();
+        return $"{name}[{GetInstanceID()}]";
     }
 
     private void OnEnable()
     {
-        GetComponent<Spawner>().ObjectSpawned += AddAffectableObject;
-        GetComponent<Spawner>().ObjectsSpawned += Explode;
+        Debug.Log($"{GetIdentifiers()} OnEnable");
+
+        _spawner.CubesSpawned += OnCubesSpawned;
     }
 
     private void OnDisable()
     {
-        GetComponent<Spawner>().ObjectSpawned -= AddAffectableObject;
-        GetComponent<Spawner>().ObjectsSpawned -= Explode;
+        Debug.Log($"{GetIdentifiers()} OnDisable");
+
+        _spawner.CubesSpawned -= OnCubesSpawned;
     }
 
-    private void AddAffectableObject(GameObject affectableObject)
+    private void OnCubesSpawned(List<Cube> spawnedCubes)
     {
-        _affectableObjects.Add(affectableObject);
+        Debug.Log($"{GetIdentifiers()} OnCubesSpawned");
+
+        _affectableCubes = spawnedCubes;
+
+        Explode();
     }
 
     private void Explode()
     {
-        List<Collider> affectedColliders;
         List<Rigidbody> affectedRigidbodies;
 
-        affectedColliders = GetAffectedColliders();
-        affectedRigidbodies = affectedColliders.Select(collider => collider.attachedRigidbody).ToList();
+        Debug.Log($"{GetIdentifiers()} Explode");
 
-        foreach (Rigidbody affectedRigidbody in affectedRigidbodies)
+        affectedRigidbodies = GetHitColliders().Where(collider => _affectableCubes.Contains(collider.gameObject.GetComponent<Cube>())).
+            Select(collider => collider.attachedRigidbody).ToList();
+
+        foreach (Rigidbody rigidbody in affectedRigidbodies)
         {
-            affectedRigidbody.AddExplosionForce(_explosionForce, transform.position, _explosionRadius);
+            rigidbody.AddExplosionForce(_explosionForce, gameObject.transform.position, _explosionRadius);
+
+            Debug.Log($"{rigidbody.GetComponent<Cube>().GetIdentifiers()} affected");
+            Debug.DrawLine(gameObject.transform.position, rigidbody.transform.position, Color.red, 2.5f);
         }
     }
 
-    private List<Collider> GetAffectedColliders()
+    private Collider[] GetHitColliders()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, _explosionRadius);
-        List<Collider> affectedColliders = new List<Collider>();
+        Collider[] hitColliders;
 
-        affectedColliders = hitColliders.Where(collider => _affectableObjects.Contains(collider.gameObject)).ToList();
+        hitColliders = Physics.OverlapSphere(gameObject.transform.position, _explosionRadius);
 
-        return affectedColliders;
+        return hitColliders;
     }
 }
