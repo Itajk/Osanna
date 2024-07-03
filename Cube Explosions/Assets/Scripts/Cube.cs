@@ -3,16 +3,19 @@ using UnityEngine;
 
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private int _minSpawnAmount;
-    [SerializeField] private int _maxSpawnAmount;
+    [SerializeField] private Spawner _spawner;
 
     public event Action CubeClicked;
+    public event Action SelfSpawned;
 
-    public int RandomSpawnAmount => UnityEngine.Random.Range(_minSpawnAmount, _maxSpawnAmount + 1);
-
-    public string GetIdentifiers()
+    public void SubscribeCubeSpawned(Spawner spawner)
     {
-        return $"{name}[{GetInstanceID()}]";
+        spawner.CubeSpawned += OnCubeSpawned;
+    }
+
+    public void UnsubscribeCubeSpawned(Spawner spawner)
+    {
+        spawner.CubeSpawned -= OnCubeSpawned;
     }
 
     private void OnMouseUpAsButton()
@@ -20,5 +23,10 @@ public class Cube : MonoBehaviour
         CubeClicked?.Invoke();
 
         Destroy(gameObject);
+    }
+
+    private void OnCubeSpawned()
+    {
+        SelfSpawned?.Invoke();
     }
 }

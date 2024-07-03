@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class Spawner : MonoBehaviour
 {
@@ -11,44 +8,36 @@ public class Spawner : MonoBehaviour
     [SerializeField] private float _spawnChancePercent;
     [SerializeField] private float _spawnChanceDiviser;
 
+    [SerializeField] private int _minSpawnAmount;
+    [SerializeField] private int _maxSpawnAmount;
+
     private List<Cube> _spawnedCubes;
 
-    public event Action<Cube> CubeSpawned;
+    public event Action CubeSpawned;
     public event Action<List<Cube>> CubesSpawned;
 
-    public string GetIdentifiers()
-    {
-        return $"{name}[{GetInstanceID()}]";
-    }
+    public int RandomSpawnAmount => UnityEngine.Random.Range(_minSpawnAmount, _maxSpawnAmount + 1);
 
     private void Awake()
     {
-        Debug.Log($"{GetIdentifiers()} Awake");
-
         _spawnedCubes = new();
     }
 
     private void OnEnable()
     {
-        Debug.Log($"{GetIdentifiers()} OnEnable");
-
         cube.CubeClicked += OnCubeClicked;
     }
 
     private void OnDisable()
     {
-        Debug.Log($"{GetIdentifiers()} OnDisable");
-
         cube.CubeClicked -= OnCubeClicked;
     }
 
     private void OnCubeClicked()
     {
-        Debug.Log($"{GetIdentifiers()} OnCubeClicked");
-
         if (RollSpawnChance())
         {
-            DivideSpawnChancePercent();
+            _spawnChancePercent /= _spawnChanceDiviser;
             SpawnCubes();
         }
     }
@@ -62,35 +51,24 @@ public class Spawner : MonoBehaviour
 
         float spawnCircleRotationRadians;
 
-        Debug.Log($"{GetIdentifiers()} SpawnCubes");
-
         spawnedCubes = new();
-        spawnAmount = cube.RandomSpawnAmount;
+        spawnAmount = RandomSpawnAmount;
 
         spawnCircleRotationRadians = GetSpawnCircleRotationRadians();
 
         for (int i = 0; i < spawnAmount; i++)
         {
-            spawnedCube = SpawnCube(GetSpawnPosition(i, spawnAmount, spawnCircleRotationRadians), GetSpawnRotation(i, spawnAmount, spawnCircleRotationRadians));
+            spawnedCube = Instantiate(cube, GetSpawnPosition(i, spawnAmount, spawnCircleRotationRadians), GetSpawnRotation(i, spawnAmount, spawnCircleRotationRadians));
             spawnedCubes.Add(spawnedCube);
+
+            spawnedCube.SubscribeCubeSpawned(this);
+            CubeSpawned?.Invoke();
+            spawnedCube.UnsubscribeCubeSpawned(this);
         }
 
         _spawnedCubes.AddRange(spawnedCubes);
 
         CubesSpawned?.Invoke(spawnedCubes);
-    }
-
-    private Cube SpawnCube(Vector3 spawnPosition, Quaternion spawnRotation)
-    {
-        Cube spawnedCube;
-
-        Debug.Log($"{GetIdentifiers()} SpawnCube");
-
-        spawnedCube = Instantiate(cube, spawnPosition, spawnRotation);
-
-        CubeSpawned?.Invoke(spawnedCube);
-
-        return spawnedCube;
     }
 
     private float GetSpawnCircleRotationRadians()
@@ -111,15 +89,13 @@ public class Spawner : MonoBehaviour
         float positionX;
         float positionY;
         float positionZ;
-        Vector3 spawnPosition;
 
         angleRadians = spawnCounter * Mathf.PI * fullAngleMultiplier / totalSpawns + spawnCircleRotationRadians;
         positionX = Mathf.Cos(angleRadians) * spawnCircleRadius;
         positionY = Vector3.up.y * gameObject.transform.localScale.y / scaleHalver;
         positionZ = Mathf.Sin(angleRadians) * spawnCircleRadius;
-        spawnPosition = gameObject.transform.position + new Vector3(positionX, positionY, positionZ);
 
-        return spawnPosition;
+        return gameObject.transform.position + new Vector3(positionX, positionY, positionZ);
     }
 
     private Quaternion GetSpawnRotation(int spawnCounter, int totalSpawns, float spawnCircleRotationRadians)
@@ -128,28 +104,18 @@ public class Spawner : MonoBehaviour
 
         float angleRadians;
         float angleDegrees;
-        Quaternion spawnRotation;
 
         angleRadians = spawnCounter * Mathf.PI * fullAngleMultiplier / totalSpawns + spawnCircleRotationRadians;
         angleDegrees = angleRadians * Mathf.Rad2Deg;
-        spawnRotation = Quaternion.Euler(0, angleDegrees, 0);
 
-        return spawnRotation;
+        return Quaternion.Euler(0, angleDegrees, 0);
     }
 
     private bool RollSpawnChance()
     {
         float minChancePercent = 0;
         float maxChancePercent = 100;
-        float rolledChance;
 
-        rolledChance = UnityEngine.Random.Range(minChancePercent, maxChancePercent - 1);
-
-        return _spawnChancePercent > rolledChance;
-    }
-
-    private void DivideSpawnChancePercent()
-    {
-        _spawnChancePercent /= _spawnChanceDiviser;
+        return _spawnChancePercent > UnityEngine.Random.Range(minChancePercent, maxChancePercent - 1);
     }
 }
