@@ -2,42 +2,37 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Cube))]
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Cube cube;
-    [SerializeField] private float _spawnChancePercent;
-    [SerializeField] private float _spawnChanceDiviser;
-
     [SerializeField] private int _minSpawnAmount;
     [SerializeField] private int _maxSpawnAmount;
 
-    private List<Cube> _spawnedCubes;
+    private Cube _cube;
 
-    public event Action CubeSpawned;
     public event Action<List<Cube>> CubesSpawned;
 
     public int RandomSpawnAmount => UnityEngine.Random.Range(_minSpawnAmount, _maxSpawnAmount + 1);
 
     private void Awake()
     {
-        _spawnedCubes = new();
+        _cube = GetComponent<Cube>();
     }
 
     private void OnEnable()
     {
-        cube.CubeClicked += OnCubeClicked;
+        _cube.CubeClicked += OnCubeClicked;
     }
 
     private void OnDisable()
     {
-        cube.CubeClicked -= OnCubeClicked;
+        _cube.CubeClicked -= OnCubeClicked;
     }
 
     private void OnCubeClicked()
     {
-        if (RollSpawnChance())
+        if (_cube.RollSpawnChance())
         {
-            _spawnChancePercent /= _spawnChanceDiviser;
             SpawnCubes();
         }
     }
@@ -58,15 +53,10 @@ public class Spawner : MonoBehaviour
 
         for (int i = 0; i < spawnAmount; i++)
         {
-            spawnedCube = Instantiate(cube, GetSpawnPosition(i, spawnAmount, spawnCircleRotationRadians), GetSpawnRotation(i, spawnAmount, spawnCircleRotationRadians));
+            spawnedCube = Instantiate(_cube, GetSpawnPosition(i, spawnAmount, spawnCircleRotationRadians), GetSpawnRotation(i, spawnAmount, spawnCircleRotationRadians));
+            spawnedCube.Initialize();
             spawnedCubes.Add(spawnedCube);
-
-            spawnedCube.SubscribeCubeSpawned(this);
-            CubeSpawned?.Invoke();
-            spawnedCube.UnsubscribeCubeSpawned(this);
         }
-
-        _spawnedCubes.AddRange(spawnedCubes);
 
         CubesSpawned?.Invoke(spawnedCubes);
     }
@@ -80,7 +70,7 @@ public class Spawner : MonoBehaviour
 
     private Vector3 GetSpawnPosition(int spawnCounter, int totalSpawns, float spawnCircleRotationRadians)
     {
-        float spawnCircleRadius = 5f;
+        float spawnCircleRadius;
 
         int scaleHalver = 2;
         int fullAngleMultiplier = 2;
@@ -89,6 +79,8 @@ public class Spawner : MonoBehaviour
         float positionX;
         float positionY;
         float positionZ;
+
+        spawnCircleRadius = gameObject.transform.localScale.y / scaleHalver;
 
         angleRadians = spawnCounter * Mathf.PI * fullAngleMultiplier / totalSpawns + spawnCircleRotationRadians;
         positionX = Mathf.Cos(angleRadians) * spawnCircleRadius;
@@ -109,13 +101,5 @@ public class Spawner : MonoBehaviour
         angleDegrees = angleRadians * Mathf.Rad2Deg;
 
         return Quaternion.Euler(0, angleDegrees, 0);
-    }
-
-    private bool RollSpawnChance()
-    {
-        float minChancePercent = 0;
-        float maxChancePercent = 100;
-
-        return _spawnChancePercent > UnityEngine.Random.Range(minChancePercent, maxChancePercent - 1);
     }
 }

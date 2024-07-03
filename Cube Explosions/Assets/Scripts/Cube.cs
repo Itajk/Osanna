@@ -1,21 +1,41 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Renderer), typeof(Rigidbody))]
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private Spawner _spawner;
+    [SerializeField] private float _scaleDiviser;
+
+    [SerializeField] private float _spawnChancePercent;
+    [SerializeField] private float _spawnChanceDiviser;
+
+    private Renderer _renderer;
+    private Rigidbody _rigidbody;
 
     public event Action CubeClicked;
-    public event Action SelfSpawned;
 
-    public void SubscribeCubeSpawned(Spawner spawner)
+    public Rigidbody Rigidbody => _rigidbody;
+
+    public void Initialize()
     {
-        spawner.CubeSpawned += OnCubeSpawned;
+        gameObject.transform.localScale /= _scaleDiviser;
+        _renderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+        _rigidbody.useGravity = true;
+        _spawnChancePercent /= _spawnChanceDiviser;
     }
 
-    public void UnsubscribeCubeSpawned(Spawner spawner)
+    public bool RollSpawnChance()
     {
-        spawner.CubeSpawned -= OnCubeSpawned;
+        float minChancePercent = 0;
+        float maxChancePercent = 100;
+
+        return _spawnChancePercent > UnityEngine.Random.Range(minChancePercent, maxChancePercent - 1);
+    }
+
+    private void Awake()
+    {
+        _renderer = GetComponent<Renderer>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void OnMouseUpAsButton()
@@ -23,10 +43,5 @@ public class Cube : MonoBehaviour
         CubeClicked?.Invoke();
 
         Destroy(gameObject);
-    }
-
-    private void OnCubeSpawned()
-    {
-        SelfSpawned?.Invoke();
     }
 }

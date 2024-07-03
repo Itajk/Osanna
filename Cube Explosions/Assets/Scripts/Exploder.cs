@@ -1,14 +1,20 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[RequireComponent(typeof(Spawner))]
 public class Exploder : MonoBehaviour
 {
-    [SerializeField] private Spawner _spawner;
-    [SerializeField] private float _explosionForce;
+    [SerializeField] private float _baseExplosionForce;
 
+    private Spawner _spawner;
     private List<Cube> _affectableCubes;
+
+    private void Awake()
+    {
+        _spawner = GetComponent<Spawner>();
+        _affectableCubes = new();
+    }
 
     private void OnEnable()
     {
@@ -20,27 +26,27 @@ public class Exploder : MonoBehaviour
         _spawner.CubesSpawned -= OnCubesSpawned;
     }
 
+    private void OnDestroy()
+    {
+        Explode();
+    }
+
     private void OnCubesSpawned(List<Cube> spawnedCubes)
     {
         _affectableCubes = spawnedCubes;
-
-        Explode();
     }
 
     private void Explode()
     {
-        List<Rigidbody> affectedRigidbodies;
-
         Vector3 explosionDirection;
 
-        affectedRigidbodies = _affectableCubes.Select(cube => cube.gameObject.GetComponent<Rigidbody>()).Where(rigidbody => rigidbody != null).ToList();
-
-        foreach (Rigidbody rigidbody in affectedRigidbodies)
+        if (_affectableCubes.Count > 0)
         {
-            if (rigidbody != null)
+            foreach (Cube cube in _affectableCubes)
             {
-                explosionDirection = Vector3.Normalize(rigidbody.transform.position - gameObject.transform.position) * _explosionForce;
-                rigidbody.AddForce(explosionDirection, ForceMode.Impulse);
+                explosionDirection = Vector3.Normalize(cube.transform.position - gameObject.transform.position) * _baseExplosionForce;
+
+                cube.Rigidbody.AddForce(explosionDirection, ForceMode.Impulse);
             }
         }
     }
