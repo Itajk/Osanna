@@ -1,11 +1,12 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using System.Linq;
 
 [RequireComponent(typeof(Spawner))]
 public class Exploder : MonoBehaviour
 {
     [SerializeField] private float _baseExplosionForce;
+    [SerializeField] private float _baseExplosionRadius;
 
     private Spawner _spawner;
     private List<Cube> _affectableCubes;
@@ -38,6 +39,10 @@ public class Exploder : MonoBehaviour
 
     private void Explode()
     {
+        float explosionForce;
+        float explosionRadius;
+        List<Cube> affectedCubes;
+
         Vector3 explosionDirection;
 
         if (_affectableCubes.Count > 0)
@@ -49,5 +54,23 @@ public class Exploder : MonoBehaviour
                 cube.Rigidbody.AddForce(explosionDirection, ForceMode.Impulse);
             }
         }
+        else
+        {
+            explosionForce = _baseExplosionForce / gameObject.transform.localScale.x;
+            explosionRadius = _baseExplosionRadius / gameObject.transform.localScale.x;
+
+            affectedCubes = Physics.OverlapSphere(gameObject.transform.position, explosionRadius).
+                Where(collider => collider.gameObject.TryGetComponent<Cube>(out Cube _)).
+                Select(collider => collider.gameObject.GetComponent<Cube>()).ToList();
+
+            foreach (Cube cube in affectedCubes)
+            {
+                explosionDirection = Vector3.Normalize(cube.Rigidbody.transform.position - gameObject.transform.position)
+                    * (_baseExplosionForce + explosionForce / Vector3.Distance(cube.Rigidbody.transform.position, gameObject.transform.position));
+
+                cube.Rigidbody.AddForce(explosionDirection, ForceMode.Impulse);
+            }
+        }
     }
 }
+
