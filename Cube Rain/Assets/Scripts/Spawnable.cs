@@ -6,34 +6,13 @@ public class Spawnable : MonoBehaviour
 {
     [SerializeField] private float _minCollisionLifespan;
     [SerializeField] private float _maxCollisionLifespan;
-
     [SerializeField] private float _emissionIntensity;
 
     private Renderer _renderer;
     private Rigidbody _rigidbody;
-
     private Spawner _spawner;
-
     private Coroutine _lifespanCoroutine;
-
     private bool _hasCollided = false;
-
-    public void SetSpawner(Spawner spawner)
-    {
-        if (_spawner == null)
-        {
-            _spawner = spawner;
-        }
-    }
-
-    public void Spawn(Vector3 spawnPosition)
-    {
-        gameObject.transform.position = spawnPosition;
-        _rigidbody.velocity = Vector3.zero;
-        _hasCollided = false;
-        _lifespanCoroutine = null;
-        _renderer.material.SetColor("_EmissionColor", Color.white * _emissionIntensity);
-    }
 
     private void Awake()
     {
@@ -57,9 +36,28 @@ public class Spawnable : MonoBehaviour
         }
     }
 
+    public void SetSpawner(Spawner spawner)
+    {
+        if (_spawner == null)
+        {
+            _spawner = spawner;
+        }
+    }
+
+    public void Initialize(Vector3 spawnPosition)
+    {
+        gameObject.transform.position = spawnPosition;
+        _rigidbody.velocity = Vector3.zero;
+        _hasCollided = false;
+        _lifespanCoroutine = null;
+        _renderer.material.SetColor("_EmissionColor", Color.white * _emissionIntensity);
+    }
+
     private IEnumerator Doom()
     {
-        yield return new WaitForSeconds(UnityEngine.Random.Range(_minCollisionLifespan, _maxCollisionLifespan));
+        WaitForSeconds wait = new WaitForSeconds(UnityEngine.Random.Range(_minCollisionLifespan, _maxCollisionLifespan));
+
+        yield return wait;
 
         if (_spawner != null)
         {

@@ -712,7 +712,7 @@ MonoBehaviour:
     type: 3}
   _spawnPointMaxOffset: 600
   _spawnRate: 0.005
-  _poolCapacity: 500
+  _poolCapacity: 250
   _poolMaxSize: 500
 --- !u!1 &1579772009
 GameObject:
