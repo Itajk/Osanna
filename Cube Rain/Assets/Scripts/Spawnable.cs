@@ -8,6 +8,7 @@ public class Spawnable : MonoBehaviour
     [SerializeField] private float _maxCollisionLifespan;
     [SerializeField] private float _emissionIntensity;
 
+    private string _emissionColorVariableName = "_EmissionColor";
     private Renderer _renderer;
     private Rigidbody _rigidbody;
     private Spawner _spawner;
@@ -27,7 +28,7 @@ public class Spawnable : MonoBehaviour
             _hasCollided = true;
 
             _renderer.material.color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-            _renderer.material.SetColor("_EmissionColor", _renderer.material.color * _emissionIntensity);
+            _renderer.material.SetColor(_emissionColorVariableName, _renderer.material.color * _emissionIntensity);
 
             if (_lifespanCoroutine == null)
             {
@@ -50,7 +51,7 @@ public class Spawnable : MonoBehaviour
         _rigidbody.velocity = Vector3.zero;
         _hasCollided = false;
         _lifespanCoroutine = null;
-        _renderer.material.SetColor("_EmissionColor", Color.white * _emissionIntensity);
+        _renderer.material.SetColor(_emissionColorVariableName, Color.white * _emissionIntensity);
     }
 
     private IEnumerator Doom()

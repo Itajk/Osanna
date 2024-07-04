@@ -1,14 +1,16 @@
 using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Spawnable _spawnable;
-    [SerializeField] private float _spawnPointMaxOffset;
     [SerializeField] private float _spawnRate;
     [SerializeField] private int _poolCapacity;
     [SerializeField] private int _poolMaxSize;
+    [SerializeField] private List<Transform> _spawnPoints;
+    [SerializeField] private List<Color> _spawnPointsColors;
 
     private ObjectPool<Spawnable> _pool;
     private Coroutine _spawningCoroutine;
@@ -26,14 +28,12 @@ public class Spawner : MonoBehaviour
             );
     }
 
-    private void OnEnable()
+    private void Start()
     {
-        _spawningCoroutine = StartCoroutine(KeepSpawning());
-    }
-
-    private void OnDisable()
-    {
-        StopCoroutine(_spawningCoroutine);
+        if (_spawnPoints.Count > 0)
+        {
+            _spawningCoroutine = StartCoroutine(KeepSpawning());
+        }
     }
 
     public void ReturnToPool(Spawnable spawnable)
@@ -56,8 +56,12 @@ public class Spawner : MonoBehaviour
 
     private void Respawn(Spawnable spawnable)
     {
+        int spawnPointIndex;
+
+        spawnPointIndex = UnityEngine.Random.Range(0, _spawnPoints.Count);
+
         spawnable.gameObject.SetActive(true);
-        spawnable.Initialize(GetSpawnPosition());
+        spawnable.Initialize(_spawnPoints[spawnPointIndex].position, _spawnPointsColors[spawnPointIndex], GetMovementDirection());
     }
 
     private IEnumerator KeepSpawning()
@@ -72,12 +76,13 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    private Vector3 GetSpawnPosition()
+    private Vector3 GetMovementDirection()
     {
-        float positionX = gameObject.transform.position.x + UnityEngine.Random.Range(-_spawnPointMaxOffset, _spawnPointMaxOffset);
-        float positionY = gameObject.transform.position.y;
-        float positionZ = gameObject.transform.position.z + UnityEngine.Random.Range(-_spawnPointMaxOffset, _spawnPointMaxOffset);
+        Vector2 circularDirection;
 
-        return new Vector3(positionX, positionY, positionZ);
+        circularDirection = UnityEngine.Random.insideUnitCircle;
+
+        return new Vector3(circularDirection.x, 0, circularDirection.y);
     }
 }
+
