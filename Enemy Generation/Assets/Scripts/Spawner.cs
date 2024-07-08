@@ -1,27 +1,25 @@
 using UnityEngine;
 using UnityEngine.Pool;
 using System.Collections;
-using System.Collections.Generic;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Spawnable _spawnable;
+    [SerializeField] private Transform _target;
+    [SerializeField] private Enemy _enemyPrefab;
+    [SerializeField] private Color _color;
     [SerializeField] private float _spawnRate;
     [SerializeField] private int _poolCapacity;
     [SerializeField] private int _poolMaxSize;
-    [SerializeField] private List<Transform> _spawnPoints;
-    [SerializeField] private List<Color> _spawnPointsColors;
 
-    private ObjectPool<Spawnable> _pool;
-    private Coroutine _spawningCoroutine;
+    private ObjectPool<Enemy> _pool;
 
     private void Awake()
     {
-        _pool = new ObjectPool<Spawnable>(
-            createFunc: () => CreateSpawnable(),
-            actionOnGet: (spawnable) => Respawn(spawnable),
-            actionOnRelease: (spawnable) => spawnable.gameObject.SetActive(false),
-            actionOnDestroy: (spawnable) => Destroy(spawnable),
+        _pool = new ObjectPool<Enemy>(
+            createFunc: () => CreateEnemy(),
+            actionOnGet: (enemy) => Respawn(enemy),
+            actionOnRelease: (enemy) => enemy.gameObject.SetActive(false),
+            actionOnDestroy: (enemy) => Destroy(enemy),
             collectionCheck: true,
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
@@ -30,38 +28,32 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        if (_spawnPoints.Count > 0)
+        StartCoroutine(KeepSpawning());
+    }
+
+    public void ReturnToPool(Enemy enemy)
+    {
+        if (enemy != null)
         {
-            _spawningCoroutine = StartCoroutine(KeepSpawning());
+            _pool.Release(enemy);
         }
     }
 
-    public void ReturnToPool(Spawnable spawnable)
+    private Enemy CreateEnemy()
     {
-        if (spawnable != null)
-        {
-            _pool.Release(spawnable);
-        }
+        Enemy enemy;
+
+        enemy = Instantiate(_enemyPrefab);
+        enemy.SetSpawner(this);
+        enemy.SetTarget(_target);
+
+        return enemy;
     }
 
-    private Spawnable CreateSpawnable()
+    private void Respawn(Enemy enemy)
     {
-        Spawnable spawnable;
-
-        spawnable = Instantiate(_spawnable);
-        spawnable.SetSpawner(this);
-
-        return spawnable;
-    }
-
-    private void Respawn(Spawnable spawnable)
-    {
-        int spawnPointIndex;
-
-        spawnPointIndex = UnityEngine.Random.Range(0, _spawnPoints.Count);
-
-        spawnable.gameObject.SetActive(true);
-        spawnable.Initialize(_spawnPoints[spawnPointIndex].position, _spawnPointsColors[spawnPointIndex], GetMovementDirection());
+        enemy.gameObject.SetActive(true);
+        enemy.Initialize(transform.position, _color);
     }
 
     private IEnumerator KeepSpawning()
@@ -74,15 +66,6 @@ public class Spawner : MonoBehaviour
 
             yield return wait;
         }
-    }
-
-    private Vector3 GetMovementDirection()
-    {
-        Vector2 circularDirection;
-
-        circularDirection = UnityEngine.Random.insideUnitCircle;
-
-        return new Vector3(circularDirection.x, 0, circularDirection.y);
     }
 }
 
