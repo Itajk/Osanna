@@ -42,20 +42,16 @@ public class Mover : MonoBehaviour
     {
         WaitForSeconds wait = new WaitForSeconds(_movementUpdateFrequency);
         int fullCircleDegrees = 360;
-        float distanceToTarget;
         float closeEnoughDistance;
 
         closeEnoughDistance = _movementSpeed * _movementUpdateFrequency;
 
-        do
+        while (Vector3.Distance(transform.position, point.position) > closeEnoughDistance)
         {
             _rigidbody.velocity = Vector3.RotateTowards(transform.forward, point.position - transform.position, Mathf.Deg2Rad * fullCircleDegrees, 0) * _movementSpeed;
 
             yield return wait;
-
-            distanceToTarget = Vector3.Distance(transform.position, point.position);
         }
-        while (distanceToTarget > closeEnoughDistance);
 
         _movePointCounter++;
 
