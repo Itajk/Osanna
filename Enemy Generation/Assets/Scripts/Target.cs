@@ -1,28 +1,20 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Collider), typeof(Mover))]
+[RequireComponent(typeof(Collider), typeof(Rigidbody))]
 public class Target : MonoBehaviour
 {
-    private Mover _mover;
-    private Collider _collider;
-
     private void Awake()
     {
-        _mover = GetComponent<Mover>();
-        _collider = GetComponent<Collider>();
-        _collider.isTrigger = true;
+        GetComponent<Rigidbody>().useGravity = false;
+        GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Collider>().isTrigger = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.TryGetComponent<Enemy>(out Enemy spawnable))
+        if (other.gameObject.TryGetComponent(out Enemy enemy))
         {
-            spawnable.ReturnToPool();
+            enemy.ReturnToPool();
         }
-    }
-
-    private void Start()
-    {
-        _mover.StartMoving();
     }
 }

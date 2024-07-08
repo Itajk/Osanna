@@ -1,68 +1,39 @@
 using UnityEngine;
-using UnityEngine.Pool;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Transform _target;
-    [SerializeField] private Enemy _enemyPrefab;
-    [SerializeField] private Color _color;
+    [SerializeField] private Transform _spawnPointsParent;
     [SerializeField] private float _spawnRate;
-    [SerializeField] private int _poolCapacity;
-    [SerializeField] private int _poolMaxSize;
 
-    private ObjectPool<Enemy> _pool;
+    private List<SpawnPoint> _spawnPoints;
 
     private void Awake()
     {
-        _pool = new ObjectPool<Enemy>(
-            createFunc: () => CreateEnemy(),
-            actionOnGet: (enemy) => Respawn(enemy),
-            actionOnRelease: (enemy) => enemy.gameObject.SetActive(false),
-            actionOnDestroy: (enemy) => Destroy(enemy),
-            collectionCheck: true,
-            defaultCapacity: _poolCapacity,
-            maxSize: _poolMaxSize
-            );
+        _spawnPoints = new List<SpawnPoint>();
+
+        for (int i = 0; i < _spawnPointsParent.childCount; i++)
+        {
+            if (_spawnPointsParent.GetChild(i).TryGetComponent(out SpawnPoint spawnPoint))
+            {
+                _spawnPoints.Add(spawnPoint);
+            }
+        }
     }
 
     private void Start()
     {
-        StartCoroutine(KeepSpawning());
+        StartCoroutine(Spawning());
     }
 
-    public void ReturnToPool(Enemy enemy)
-    {
-        if (enemy != null)
-        {
-            _pool.Release(enemy);
-        }
-    }
-
-    private Enemy CreateEnemy()
-    {
-        Enemy enemy;
-
-        enemy = Instantiate(_enemyPrefab);
-        enemy.SetSpawner(this);
-        enemy.SetTarget(_target);
-
-        return enemy;
-    }
-
-    private void Respawn(Enemy enemy)
-    {
-        enemy.gameObject.SetActive(true);
-        enemy.Initialize(transform.position, _color);
-    }
-
-    private IEnumerator KeepSpawning()
+    private IEnumerator Spawning()
     {
         WaitForSeconds wait = new WaitForSeconds(_spawnRate);
 
-        while (true)
+        while (enabled)
         {
-            _pool.Get();
+            _spawnPoints[Random.Range(0, _spawnPoints.Count)].Spawn();
 
             yield return wait;
         }
