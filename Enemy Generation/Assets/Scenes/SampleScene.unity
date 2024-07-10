@@ -191,6 +191,11 @@ PrefabInstance:
       propertyPath: _pathPointsParent
       value: 
       objectReference: {fileID: 1156567592}
+    - target: {fileID: 1539187767556388102, guid: 15c6da5d1f001564686d897310f371ea,
+        type: 3}
+      propertyPath: _movementSpeedPerSecond
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 4442161596650398565, guid: 15c6da5d1f001564686d897310f371ea,
         type: 3}
       propertyPath: _movementSpeed
@@ -373,16 +378,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 274767286}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 502ba9b99f28c3a408324584cb84b47a, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a7bd11d5ffbb0441936c37aff5c1dd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 1024886555}
   _enemyPrefab: {fileID: 2369770335880037313, guid: 8b030ae4191f7ac49916e03815e7591f,
     type: 3}
   _color: {r: 0, g: 0.60784316, b: 0, a: 0}
-  _spawnRate: 0.25
-  _poolCapacity: 100
-  _poolMaxSize: 100
 --- !u!1 &298914589
 GameObject:
   m_ObjectHideFlags: 0
@@ -624,6 +626,11 @@ PrefabInstance:
       propertyPath: _pathPointsParent
       value: 
       objectReference: {fileID: 1741607205}
+    - target: {fileID: 1539187767556388102, guid: 15c6da5d1f001564686d897310f371ea,
+        type: 3}
+      propertyPath: _movementSpeedPerSecond
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 4442161596650398565, guid: 15c6da5d1f001564686d897310f371ea,
         type: 3}
       propertyPath: _movementSpeed
@@ -1041,16 +1048,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 834588264}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 502ba9b99f28c3a408324584cb84b47a, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a7bd11d5ffbb0441936c37aff5c1dd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 1002829203}
-  _enemyPrefab: {fileID: 6495381675650990890, guid: a952284267d3ead4fbcd8711712e70f2,
+  _enemyPrefab: {fileID: 7948978001615672822, guid: ad3cbfbfc0ecb0d4cb82939a3f929293,
     type: 3}
   _color: {r: 0, g: 0, b: 0.60784316, a: 0}
-  _spawnRate: 0.25
-  _poolCapacity: 100
-  _poolMaxSize: 100
 --- !u!1 &918486106
 GameObject:
   m_ObjectHideFlags: 0
@@ -1261,6 +1265,52 @@ Transform:
   - {fileID: 326498333}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: 0}
+--- !u!1 &1319521344
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1319521346}
+  - component: {fileID: 1319521345}
+  m_Layer: 0
+  m_Name: Spawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1319521345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319521344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 502ba9b99f28c3a408324584cb84b47a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spawnPointsParent: {fileID: 1588577119}
+  _spawnRate: 0.05
+--- !u!4 &1319521346
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319521344}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -21.741524, y: -64.15251, z: 21.892792}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1342049402
 GameObject:
   m_ObjectHideFlags: 0
@@ -1333,16 +1383,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1477374718}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 502ba9b99f28c3a408324584cb84b47a, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a7bd11d5ffbb0441936c37aff5c1dd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 1671220046}
   _enemyPrefab: {fileID: 2312680654266149366, guid: 7f21e4cd11fc6974bb610310000b6833,
     type: 3}
   _color: {r: 0.60784316, g: 0.60784316, b: 0, a: 0}
-  _spawnRate: 0.25
-  _poolCapacity: 100
-  _poolMaxSize: 100
 --- !u!1 &1543282451
 GameObject:
   m_ObjectHideFlags: 0
@@ -1384,16 +1431,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1543282451}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 502ba9b99f28c3a408324584cb84b47a, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a7bd11d5ffbb0441936c37aff5c1dd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 431629220}
-  _enemyPrefab: {fileID: 7948978001615672822, guid: ad3cbfbfc0ecb0d4cb82939a3f929293,
+  _enemyPrefab: {fileID: 6495381675650990890, guid: a952284267d3ead4fbcd8711712e70f2,
     type: 3}
   _color: {r: 0.60784316, g: 0, b: 0, a: 0}
-  _spawnRate: 0.25
-  _poolCapacity: 100
-  _poolMaxSize: 100
 --- !u!1 &1553396804
 GameObject:
   m_ObjectHideFlags: 0
@@ -1787,6 +1831,11 @@ PrefabInstance:
       propertyPath: _pathPointsParent
       value: 
       objectReference: {fileID: 1229289426}
+    - target: {fileID: 1539187767556388102, guid: 15c6da5d1f001564686d897310f371ea,
+        type: 3}
+      propertyPath: _movementSpeedPerSecond
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 4442161596650398565, guid: 15c6da5d1f001564686d897310f371ea,
         type: 3}
       propertyPath: _movementSpeed
@@ -1940,6 +1989,11 @@ PrefabInstance:
       propertyPath: _pathPointsParent
       value: 
       objectReference: {fileID: 918486107}
+    - target: {fileID: 1539187767556388102, guid: 15c6da5d1f001564686d897310f371ea,
+        type: 3}
+      propertyPath: _movementSpeedPerSecond
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 4442161596650398565, guid: 15c6da5d1f001564686d897310f371ea,
         type: 3}
       propertyPath: _movementSpeed
@@ -2104,3 +2158,4 @@ SceneRoots:
   - {fileID: 1741607205}
   - {fileID: 1156567592}
   - {fileID: 1229289426}
+  - {fileID: 1319521346}

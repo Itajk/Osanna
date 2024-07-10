@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Mover : MonoBehaviour
 {
-    [SerializeField] private float _movementSpeed;
+    [SerializeField] private float _movementSpeedPerSecond;
     [SerializeField] private float _movementUpdateFrequency;
 
     private Coroutine _movingCoroutine;
@@ -21,11 +21,12 @@ public class Mover : MonoBehaviour
     private IEnumerator Moving(Transform target)
     {
         WaitForSeconds wait = new WaitForSeconds(_movementUpdateFrequency);
-        float closeEnoughDistance = _movementSpeed * _movementUpdateFrequency;
+        float maxStepPerUpdate = _movementSpeedPerSecond * _movementUpdateFrequency;
 
-        while ((transform.position - target.position).sqrMagnitude > closeEnoughDistance)
+        while ((transform.position - target.position).sqrMagnitude > 0)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target.position, _movementSpeed);
+            transform.LookAt(target.position);
+            transform.position = Vector3.MoveTowards(transform.position, target.position, maxStepPerUpdate);
 
             yield return wait;
         }

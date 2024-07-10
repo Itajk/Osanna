@@ -4,7 +4,7 @@ using UnityEngine;
 public class PathFollower : MonoBehaviour
 {
     [SerializeField] private Transform _pathPointsParent;
-    [SerializeField] private float _movementSpeed;
+    [SerializeField] private float _movementSpeedPerSecond;
     [SerializeField] private float _movementUpdateFrequency;
 
     private Transform[] _pathPoints;
@@ -19,28 +19,28 @@ public class PathFollower : MonoBehaviour
         {
             _pathPoints[i] = _pathPointsParent.GetChild(i);
         }
-
-        if (_pathPoints.Length > 0)
-        {
-            _targetPoint = _pathPoints[_nextPointIndex];
-        }
     }
 
     private void Start()
     {
-        StartCoroutine(Moving());
+        if (_pathPoints.Length > 0)
+        {
+            _targetPoint = _pathPoints[_nextPointIndex];
+
+            StartCoroutine(Moving());
+        }
     }
 
     private IEnumerator Moving()
     {
         WaitForSeconds wait = new WaitForSeconds(_movementUpdateFrequency);
-        float closeEnoughDistance = _movementSpeed * _movementUpdateFrequency;
+        float maxStepPerUpdate = _movementSpeedPerSecond * _movementUpdateFrequency;
 
         while (enabled)
         {
-            while ((transform.position - _targetPoint.position).sqrMagnitude > closeEnoughDistance)
+            while ((transform.position - _targetPoint.position).sqrMagnitude > 0)
             {
-                transform.position = Vector3.MoveTowards(transform.position, _targetPoint.position, _movementSpeed);
+                transform.position = Vector3.MoveTowards(transform.position, _targetPoint.position, maxStepPerUpdate);
 
                 yield return wait;
             }

@@ -24,7 +24,10 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(Spawning());
+        if (_spawnPoints.Count > 0)
+        {
+            StartCoroutine(Spawning());
+        }
     }
 
     private IEnumerator Spawning()

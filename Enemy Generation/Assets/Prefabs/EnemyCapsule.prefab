@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 3610234775550303029}
   - component: {fileID: 2195596301855119274}
   - component: {fileID: 5282250235436810549}
-  - component: {fileID: 7996876109661048432}
   - component: {fileID: 6495381675650990890}
+  - component: {fileID: 4918380278438219725}
   m_Layer: 0
   m_Name: EnemyCapsule
   m_TagString: Untagged
@@ -109,20 +109,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7996876109661048432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2686729572270152812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef88337484d35a64d9c1134f6edefd3e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _movementSpeed: 2
-  _movementUpdateFrequency: 0.1
 --- !u!114 &6495381675650990890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,3 +121,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fe7e5a8de7760f4e85adef21a35ecf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4918380278438219725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2686729572270152812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478c00f803c42d44eb8bc5175d6d6329, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _movementSpeedPerSecond: 18
+  _movementUpdateFrequency: 0.1
