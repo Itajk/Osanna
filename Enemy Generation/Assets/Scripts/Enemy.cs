@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
     private Renderer _renderer;
     private Mover _mover;
 
-    public event Action<Enemy> ReturnedToPool;
+    public event Action<Enemy> Died;
 
     private void Awake()
     {
@@ -22,8 +22,8 @@ public class Enemy : MonoBehaviour
        _mover.StartMoving(target);
     }
 
-    public void ReturnToPool()
+    public void TargetReached()
     {
-        ReturnedToPool?.Invoke(this);
+        Died?.Invoke(this);
     }
 }

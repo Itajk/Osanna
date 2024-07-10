@@ -6,16 +6,9 @@ public class Mover : MonoBehaviour
     [SerializeField] private float _movementSpeedPerSecond;
     [SerializeField] private float _movementUpdateFrequency;
 
-    private Coroutine _movingCoroutine;
-
-    private void OnDisable()
-    {
-        StopCoroutine(_movingCoroutine);
-    }
-
     public void StartMoving(Transform target)
     {
-        _movingCoroutine = StartCoroutine(Moving(target));
+        StartCoroutine(Moving(target));
     }
 
     private IEnumerator Moving(Transform target)

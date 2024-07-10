@@ -29,7 +29,7 @@ public class SpawnPoint : MonoBehaviour
         _pool.Get();
     }
 
-    private void ReturnToPool(Enemy enemy)
+    private void OnEnemyDied(Enemy enemy)
     {
         _pool.Release(enemy);
     }
@@ -39,7 +39,7 @@ public class SpawnPoint : MonoBehaviour
         Enemy enemy;
         
         enemy = Instantiate(_enemyPrefab);
-        enemy.ReturnedToPool += ReturnToPool;
+        enemy.Died += OnEnemyDied;
 
         return enemy;
     }

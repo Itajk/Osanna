@@ -17,7 +17,7 @@ public class Target : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out Enemy enemy))
         {
-            enemy.ReturnToPool();
+            enemy.TargetReached();
         }
     }
 }
