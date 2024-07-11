@@ -31,7 +31,7 @@ public class Bullet : MonoBehaviour
         _rigidbody.velocity = transform.position.normalized * _speed;
     }
 
-    public void TargetReached()
+    public void Die()
     {
         Died?.Invoke(this);
     }
@@ -40,6 +40,6 @@ public class Bullet : MonoBehaviour
     {
         yield return _wait;
 
-        Died?.Invoke(this);
+        Die();
     }
 }

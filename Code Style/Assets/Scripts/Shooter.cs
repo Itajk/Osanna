@@ -44,9 +44,8 @@ public class Shooter : MonoBehaviour
 
     private Bullet CreateBullet()
     {
-        Bullet bullet;
+        Bullet bullet = Instantiate(_bulletPrefab);
 
-        bullet = Instantiate(_bulletPrefab);
         bullet.Died += OnBulletDied;
 
         return bullet;

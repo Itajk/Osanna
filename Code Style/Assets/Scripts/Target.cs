@@ -12,7 +12,7 @@ public class Target : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out Bullet projectile))
         {
-            projectile.TargetReached();
+            projectile.Die();
         }
     }
 }

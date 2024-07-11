@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PathFollower : MonoBehaviour
 {
-    [SerializeField] private float _movementSpeedPerSecond;
+    [SerializeField] private float _speed;
     [SerializeField] private Transform _pathPointsParent;
 
     private float _movementUpdateFrequency = 0.05f;
@@ -34,13 +34,15 @@ public class PathFollower : MonoBehaviour
     private IEnumerator Moving()
     {
         WaitForSeconds wait = new WaitForSeconds(_movementUpdateFrequency);
+        float maxStep;
 
         while (enabled)
         {
-            while ((transform.position - _targetPoint.position).sqrMagnitude > 0)
+            while (transform.position != _targetPoint.position)
             {
                 transform.LookAt(_targetPoint.position);
-                transform.position = Vector3.MoveTowards(transform.position, _targetPoint.position, _movementSpeedPerSecond * _movementUpdateFrequency);
+                maxStep = _speed * _movementUpdateFrequency;
+                transform.position = Vector3.MoveTowards(transform.position, _targetPoint.position, maxStep);
 
                 yield return wait;
             }
