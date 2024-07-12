@@ -4,8 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class AlarmTrigger : MonoBehaviour
 {
-    public event Action FrontEntered;
-    public event Action BackEntered;
+    public event Action ThiefEntered;
+    public event Action ThiefLeft;
 
     private void Awake()
     {
@@ -16,28 +16,15 @@ public class AlarmTrigger : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out PathFollower _))
         {
-            if (IsFrontEntered(other))
-            {
-                FrontEntered?.Invoke();
-            }
-            else
-            {
-                BackEntered?.Invoke();
-            }
+            ThiefEntered?.Invoke();
         }
     }
 
-    private bool IsFrontEntered(Collider other)
+    private void OnTriggerExit(Collider other)
     {
-        float frontalArcDegrees = 90;
-        Vector2 forwardDirection;
-        Vector3 targetDirection3D;
-        Vector2 targetDirection;
-
-        forwardDirection = new Vector2(transform.forward.z, transform.forward.x);
-        targetDirection3D = (other.transform.position - transform.position).normalized;
-        targetDirection = new Vector2(targetDirection3D.z, targetDirection3D.x);
-
-        return Vector2.Angle(forwardDirection, targetDirection) <= frontalArcDegrees;
+        if (other.gameObject.TryGetComponent(out PathFollower _))
+        {
+            ThiefLeft?.Invoke();
+        }
     }
 }

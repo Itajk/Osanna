@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource), typeof(AlarmTrigger))]
@@ -6,9 +7,10 @@ public class AlarmSoundPlayer : MonoBehaviour
     private AudioSource _audioSource;
     private AlarmTrigger _alarmTrigger;
     private float _volumeChangeRate = 0.1f;
-    private bool _isPlaying = false;
+    private float _volumeChangeFrequency;
     private float _maxVolume = 1f;
     private float _minVolume = 0f;
+    private Coroutine _volumeChange;
 
     private void Awake()
     {
@@ -16,56 +18,71 @@ public class AlarmSoundPlayer : MonoBehaviour
         _audioSource.loop = true;
         _audioSource.volume = _minVolume;
         _alarmTrigger = GetComponent<AlarmTrigger>();
+        _volumeChangeFrequency = Time.fixedDeltaTime;
     }
 
     private void OnEnable()
     {
-        _alarmTrigger.FrontEntered += OnFrontEntered;
-        _alarmTrigger.BackEntered += OnBackEntered;
+        _alarmTrigger.ThiefEntered += OnThiefEntered;
+        _alarmTrigger.ThiefLeft += OnThiefLeft;
     }
 
     private void OnDisable()
     {
-        _alarmTrigger.BackEntered -= OnBackEntered;
-        _alarmTrigger.FrontEntered -= OnFrontEntered;
+        _alarmTrigger.ThiefEntered -= OnThiefEntered;
+        _alarmTrigger.ThiefLeft -= OnThiefLeft;
     }
 
-    private void Update()
+    private void OnThiefEntered()
     {
-        if (_isPlaying)
+        if (_audioSource.isPlaying == false)
         {
-            if (_audioSource.isPlaying == false)
-            {
-                _audioSource.Play();
-            }
-
-            if (_audioSource.volume < _maxVolume)
-            {
-                _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _maxVolume,
-                    _volumeChangeRate * Time.deltaTime);
-            }
+            _audioSource.Play();
         }
-        else if (_audioSource.isPlaying)
+
+        if (_volumeChange != null)
         {
-            if (_audioSource.volume > _minVolume)
-            {
-                _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _minVolume,
-                    _volumeChangeRate * Time.deltaTime);
-            }
-            else
-            {
-                _audioSource.Stop();
-            }
+            StopCoroutine(_volumeChange);
+        }
+
+        _volumeChange = StartCoroutine(Increasing());
+    }
+
+    private IEnumerator Increasing()
+    {
+        WaitForSeconds wait = new WaitForSeconds(_volumeChangeFrequency);
+
+        while (_audioSource.volume < _maxVolume)
+        {
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _maxVolume,
+                _volumeChangeRate * _volumeChangeFrequency);
+
+            yield return wait;
         }
     }
 
-    private void OnFrontEntered()
+    private void OnThiefLeft()
     {
-        _isPlaying = true;
+        if (_volumeChange != null)
+        {
+            StopCoroutine(_volumeChange);
+        }
+
+        _volumeChange = StartCoroutine(Fading());
     }
 
-    private void OnBackEntered()
+    private IEnumerator Fading()
     {
-        _isPlaying = false;
+        WaitForSeconds wait = new WaitForSeconds(_volumeChangeFrequency);
+
+        while (_audioSource.volume > _minVolume)
+        {
+            _audioSource.volume = Mathf.MoveTowards(_audioSource.volume, _minVolume,
+                _volumeChangeRate * _volumeChangeFrequency);
+
+            yield return wait;
+        }
+
+        _audioSource.Stop();
     }
 }
