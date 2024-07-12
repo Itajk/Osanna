@@ -4,8 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class AlarmTrigger : MonoBehaviour
 {
-    public event Action ThiefEntered;
-    public event Action ThiefLeft;
+    [SerializeField] private Alarm _alarm;
 
     private void Awake()
     {
@@ -16,7 +15,7 @@ public class AlarmTrigger : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out PathFollower _))
         {
-            ThiefEntered?.Invoke();
+            _alarm.TurnOn();
         }
     }
 
@@ -24,7 +23,7 @@ public class AlarmTrigger : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out PathFollower _))
         {
-            ThiefLeft?.Invoke();
+           _alarm.TurnOff();
         }
     }
 }
