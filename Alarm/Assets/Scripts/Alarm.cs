@@ -56,7 +56,7 @@ public class Alarm : MonoBehaviour
             yield return wait;
         }
 
-        if (_audioSource.volume == _minVolume)
+        if (targetVolume == _minVolume)
         {
             _audioSource.Stop();
         }
