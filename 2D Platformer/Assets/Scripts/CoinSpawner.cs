@@ -1,13 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class CoinSpawner : MonoBehaviour
 {
     [SerializeField] private Coin _coinPrefab;
-    [SerializeField] private Transform[] _spawnPathsParents;
-
-    private List<CoinSpawnPath> _spawnPaths;
+    [SerializeField] private CoinPlacer _coinPlacer;
 
     private ObjectPool<Coin> _pool;
     private int _poolCapacity = 250;
@@ -24,37 +21,17 @@ public class CoinSpawner : MonoBehaviour
             defaultCapacity: _poolCapacity,
             maxSize: _poolMaxSize
             );
-
-        _spawnPaths = new();
-
-        foreach(Transform spawnPathParent in _spawnPathsParents)
-        {
-            if (spawnPathParent.TryGetComponent(out CoinSpawnPath _spawnPath))
-            {
-                _spawnPaths.Add(_spawnPath);
-            }
-        }
     }
 
     private void Start()
     {
-        foreach (CoinSpawnPath spawnPath in _spawnPaths)
+        while (_coinPlacer.HasSpace)
         {
-            while (spawnPath.IsEndReached == false)
-            {
-                spawnPath.PlaceCoin(_pool.Get());
-            }
-
-            spawnPath.PlaceCoin(_pool.Get());
+            _coinPlacer.PlaceCoin(_pool.Get());
         }
     }
 
-    public void Spawn()
-    {
-        _pool.Get();
-    }
-
-    private void OnCoinDisappeared(Coin coin)
+    private void OnCoinPickedUp(Coin coin)
     {
         _pool.Release(coin);
     }
@@ -62,7 +39,8 @@ public class CoinSpawner : MonoBehaviour
     private Coin CreateCoin()
     {
         Coin coin = Instantiate(_coinPrefab);
-        coin.Disappeared += OnCoinDisappeared;
+
+        coin.PickedUp += OnCoinPickedUp;
 
         return coin;
     }

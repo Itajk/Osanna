@@ -1,54 +1,36 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Animator), typeof(Collider2D), typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
-    private const string HorizontalAxis = "Horizontal";
-    private const string JumpAxis = "Jump";
-    private const string IsMovingVariableName = "IsMoving";
+    [SerializeField] private InputReader _inputReader;
+    [SerializeField] private Mover _mover;
+    [SerializeField] private Jumper _jumper;
+    [SerializeField] private PlayerCollisionResolver _collisionResolver;
+    [SerializeField] private Animator _animator;
+    [SerializeField] private CoinCollector _coinPicker;
+    [SerializeField] private int _coins = 0;
 
-    [SerializeField] private float _jumpForce;
-    [SerializeField] private float _movementSpeed;
-    [SerializeField] private int _coins;
-
-    private float _horizontalInput;
-    private float _jumpInput;
-    private Animator _animator;
-    private Rigidbody2D _rigidbody;
-    private float _deltaX = 0;
-
-    private void Awake()
+    private void OnEnable()
     {
-        _animator = GetComponent<Animator>();
-        _rigidbody = GetComponent<Rigidbody2D>();
-    }
-
-    private void Update()
-    {
-        _horizontalInput = Input.GetAxis(HorizontalAxis);
-        _jumpInput = Input.GetAxis(JumpAxis);
-
-        _animator.SetBool(IsMovingVariableName, Mathf.Abs(_deltaX) > 0);
+        _coinPicker.CoinPickedUp += OnCoinPickedUp;
     }
 
     private void FixedUpdate()
     {
-        _deltaX = _horizontalInput * _movementSpeed * Time.fixedDeltaTime * transform.right.x;
-
-        if (_deltaX < 0)
+        if (_mover.Move(_inputReader.HorizontalInput) != 0)
         {
-            transform.rotation *= Quaternion.FromToRotation(Vector2.right, Vector2.left);
+            transform.forward = new Vector3(0, 0, Mathf.Sign(_inputReader.HorizontalInput));
         }
 
-        transform.Translate(_deltaX, 0, 0);
-
-        if (_jumpInput > 0 && _rigidbody.velocity.y == 0)
+        if (_inputReader.JumpInput > 0 && _collisionResolver.IsGrounded)
         {
-            _rigidbody.AddForce(Vector2.up * _jumpForce);
+            _jumper.Jump();
         }
+
+        _animator.SetBool(nameof(_mover.IsMoving), _mover.IsMoving);
     }
 
-    public void AddCoin()
+    private void OnCoinPickedUp()
     {
         _coins++;
     }

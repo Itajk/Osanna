@@ -1,23 +1,17 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider2D), typeof(Animator))]
 public class Coin : MonoBehaviour
 {
-    public event Action<Coin> Disappeared;
+    public event Action<Coin> PickedUp;
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void Initialize(Vector2 position)
     {
-        if (collision.TryGetComponent(out Player player))
-        {
-            player.AddCoin();
-
-            Disappeared?.Invoke(this);
-        }
+        transform.position = position;
     }
 
-    public void Initialize(Vector2 spawnPosition)
+    public void PickUp()
     {
-        transform.position = spawnPosition;
+        PickedUp?.Invoke(this);
     }
 }

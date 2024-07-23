@@ -1,76 +1,47 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Animator), typeof(Collider2D), typeof(Rigidbody2D))]
+
 public class Enemy : MonoBehaviour
 {
-    private const string IsMovingVariableName = "IsMoving";
+    [SerializeField] private Mover _mover;
+    [SerializeField] private EnemyCollisionResolver _collisionResolver;
+    [SerializeField] private Animator _animator;
 
-    [SerializeField] private float _speed;
-    [SerializeField] private Transform _path;
-
-    private Transform[] _waypoints;
-    private int _currentWaypoint = 0;
-    private Transform _target;
-    private Animator _animator;
-
-    private float _updateFrequency = 0.02f;
-    private float _closeEnoughDistance = 0.1f;
-
-    private void Awake()
-    {
-        _animator = GetComponent<Animator>();
-
-        _waypoints = new Transform[_path.childCount];
-
-        for (int i = 0; i < _waypoints.Length; i++)
-        {
-            _waypoints[i] = _path.GetChild(i);
-        }
-    }
+    private bool _isTurning = false;
 
     private void Start()
     {
-        if (_waypoints.Length > 0)
-        {
-            _target = _waypoints[_currentWaypoint];
-
-            StartCoroutine(Moving());
-        }
+        StartCoroutine(Patrolling());
     }
 
-    private IEnumerator Moving()
+    private IEnumerator Patrolling()
     {
-        WaitForSeconds wait = new WaitForSeconds(_updateFrequency);
-
-        _animator.SetBool(IsMovingVariableName, true);
+        WaitForSeconds wait = new WaitForSeconds(Time.fixedDeltaTime);
 
         while (enabled)
         {
-            while ((transform.position - _target.position).sqrMagnitude > _closeEnoughDistance)
-            {
-                RotateTowardsTarget();
-                transform.position = Vector3.MoveTowards(transform.position, _target.position,
-                    _speed * _updateFrequency);
+            _mover.Move(transform.right.x);
 
-                yield return wait;
+            if ((_collisionResolver.IsOnEdge || _collisionResolver.IsOnDeadEnd) && _isTurning == false)
+            {
+                _isTurning = true;
+                transform.forward = new Vector3(0, 0, -transform.forward.z);
+                StartCoroutine(Turning());
             }
 
-            _target = _waypoints[++_currentWaypoint % _waypoints.Length];
-        }
+            _animator.SetBool(nameof(_mover.IsMoving), _mover.IsMoving);
 
-        _animator.SetBool(IsMovingVariableName, false);
+            yield return wait;
+        }
     }
 
-    private void RotateTowardsTarget()
+    private IEnumerator Turning()
     {
-        Vector2 forwardDirection;
-        Vector3 targetDirection3D;
-        Vector2 targetDirection;
+        WaitForSeconds wait = new WaitForSeconds(1f);
 
-        forwardDirection = transform.right;
-        targetDirection3D = (_target.transform.position - transform.position).normalized;
-        targetDirection = new Vector2(targetDirection3D.x, 0);
-        transform.Rotate(0, Vector2.SignedAngle(forwardDirection, targetDirection), 0);
+        yield return wait;
+
+        _isTurning = false;
     }
 }
